@@ -35,7 +35,7 @@ export function ConversationPanel() {
               </div>
             </div>
             <div className="actor element">
-              <div className="stand"><img id="p-elart" alt="" src={m ? 'assets/sunny/ui/' + m.art + '.png' : undefined} /></div>
+              <div className="stand"><img id="p-elart" alt="" src={m ? 'assets/' + m.art : undefined} /></div>
               <div className="nm"><span className="ic" id="p-icon">{m?.icon}</span><span id="p-title">{m?.title}</span></div>
             </div>
           </div>

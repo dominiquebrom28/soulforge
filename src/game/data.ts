@@ -51,11 +51,16 @@ export function rampColor(L: number, ramp: number[][]) {
   return [lo[0] + (hi[0] - lo[0]) * t | 0, lo[1] + (hi[1] - lo[1]) * t | 0, lo[2] + (hi[2] - lo[2]) * t | 0]
 }
 
-export type ObjectMeta = { icon: string; color: string; art: string; title: string; desc: string; meta: string }
+// art = relative path under /assets used for the conversation-drawer element image
+export type ObjectMeta = { icon: string; color: string; art: string; title: string; desc: string; meta: string; enter?: boolean }
 export const OBJECTS_META: Record<string, ObjectMeta> = {
-  monument: { icon: '⬡', color: '#a78bfa', art: 'door', title: 'THE MONUMENT', desc: 'Look closer — this monument is <b>you</b>. Everything you become is etched into its stone.', meta: 'Two views within: the 6-stat Hexagon and the 4 Realms.' },
-  shrine: { icon: '🕯', color: '#23d18b', art: 'house', title: 'THE HABIT SHRINE', desc: 'Tend your daily habits at my altar, and a light kindles for each one kept.', meta: '11 starting habits → XP into their linked stats.' },
-  quest: { icon: '📋', color: '#ffb02e', art: 'sign', title: 'THE QUEST BOARD', desc: 'Take a quest from the board, traveller — a Daily, a Weekly, or a Monthly BOSS.', meta: 'Quest XP splits across its realm’s 2 core stats.' },
+  journal: { icon: '📖', color: '#7fb8d8', art: 'sf/cave.png', title: 'THE JOURNAL CAVE', desc: 'Step inside and reflect — write today, then flip back through the pages you’ve lived.', meta: 'Daily reflection + a memorable moment; past entries live here as a book.', enter: true },
+  leo: { icon: '🐾', color: '#f6b73c', art: 'sf/campfire_still.png', title: 'LEO’S CAMPFIRE', desc: 'Sit a while with Leo by the fire. Calm shared here deepens your bond.', meta: 'Bond level + title; calm moments raise it (→ Presence XP at max).' },
+  shrine: { icon: '🕯', color: '#23d18b', art: 'sunny/ui/house.png', title: 'THE HABIT SHRINE', desc: 'Tend your daily habits at my altar, and a light kindles for each one kept.', meta: '11 starting habits → XP into their linked stats.' },
+  monument: { icon: '⬡', color: '#a78bfa', art: 'sunny/ui/door.png', title: 'THE MONUMENT', desc: 'Look closer — this monument is <b>you</b>. Everything you become is etched into its stone.', meta: 'Two views within: the 6-stat Hexagon and the 4 Realms.' },
+  quest: { icon: '📋', color: '#ffb02e', art: 'sunny/ui/sign.png', title: 'THE QUEST BOARD', desc: 'Take a quest from the board, traveller — a Daily, a Weekly, or a Monthly BOSS.', meta: 'Quest XP splits across its realm’s 2 core stats.' },
+  todo: { icon: '📝', color: '#9fb2c9', art: 'sf/board.png', title: 'TODAY’S TASKS', desc: 'Pin what must happen today. Cross them off as you go — no XP, just clarity.', meta: 'A freeform daily checklist; you reset it yourself.' },
+  archive: { icon: '📚', color: '#c9a06a', art: 'sf/archive.png', title: 'THE LEVEL ARCHIVE', desc: 'Enter the archive — every level, threshold, and realm mastery, catalogued.', meta: 'Full Lv 1–10 table, per-realm mastery, and Leo bond reference.', enter: true },
 }
 
 /* ---- time/season → sky tint + weather + clock (keeps the world matching reality) ---- */
@@ -82,12 +87,27 @@ export function computeTheme(): Theme {
   return { season, tod, grade: GRADE, bg, fg, weather } as Theme
 }
 
-/* ---- world geometry (unchanged playable layout) ---- */
-export const WORLD = { w: 2800, h: 1400 }
+/* ---- world geometry ---- full cozy village, all 7 elements placed logically ---- */
+export const WORLD = { w: 3200, h: 1400 }
 export const GROUND_TOP = 1200
-export const SPAWN = { x: 420, y: 1130 }
+export const SPAWN = { x: 700, y: 1130 } // home base, near Leo's campfire
 export const S = 2 // pixel scale
-export const PLATFORMS = [{ x: 760, y: 1050, w: 190 }, { x: 1120, y: 960, w: 170 }, { x: 1740, y: 1055, w: 220 }, { x: 1995, y: 920, w: 220 }, { x: 2280, y: 790, w: 360 }]
-export const INTERACTABLES = [{ id: 'shrine', wx: 980, wy: GROUND_TOP }, { id: 'quest', wx: 1380, wy: GROUND_TOP }, { id: 'monument', wx: 2280, wy: 790 }]
+// stepping platforms climb to the Monument on the central high platform (the world's heart)
+export const PLATFORMS = [
+  { x: 1560, y: 1050, w: 150 },
+  { x: 1770, y: 920, w: 160 },
+  { x: 1980, y: 1030, w: 150 },
+  { x: 1820, y: 780, w: 380 }, // Monument platform (central peak)
+]
+// left → right: Journal Cave (secluded) · Leo campfire + Todo (home) · Shrine + Quest (town, under the Monument) · Archive (town edge)
+export const INTERACTABLES = [
+  { id: 'journal', wx: 430, wy: GROUND_TOP },
+  { id: 'leo', wx: 840, wy: GROUND_TOP },
+  { id: 'todo', wx: 1090, wy: GROUND_TOP },
+  { id: 'shrine', wx: 1520, wy: GROUND_TOP },
+  { id: 'monument', wx: 1820, wy: 780 },
+  { id: 'quest', wx: 2120, wy: GROUND_TOP },
+  { id: 'archive', wx: 2700, wy: GROUND_TOP },
+]
 // Sunny Land tileset (16px, 25 cols): grass-top tiles 26/28/30, dirt fill 51
 export const TILE = { grassL: 26, grass: 28, grassR: 30, dirt: 51 }

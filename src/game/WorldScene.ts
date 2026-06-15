@@ -20,6 +20,11 @@ export class WorldScene extends Phaser.Scene {
     this.load.image('tiles', 'assets/sunny/env/tileset.png')
     this.load.atlas('ents', 'assets/sunny/atlas/entities.png', 'assets/sunny/atlas/entities.json')
     this.load.atlas('props', 'assets/sunny/atlas/props.png', 'assets/sunny/atlas/props.json')
+    // bespoke Soulforge landmark art (cave / campfire / noticeboard / archive)
+    this.load.image('sf_cave', 'assets/sf/cave.png')
+    this.load.image('sf_board', 'assets/sf/board.png')
+    this.load.image('sf_archive', 'assets/sf/archive.png')
+    this.load.spritesheet('sf_campfire', 'assets/sf/campfire.png', { frameWidth: 34, frameHeight: 34 })
     // LPC modular character options (64x64 walk sheets). Art: Liberated Pixel Cup (CC-BY-SA 3.0 / GPL).
     this.load.image('o_body_male', 'assets/lpc/body/male.png'); this.load.image('o_body_female', 'assets/lpc/body/female.png')
     this.load.image('o_head_male', 'assets/lpc/head/male.png'); this.load.image('o_head_female', 'assets/lpc/head/female.png')
@@ -46,7 +51,9 @@ export class WorldScene extends Phaser.Scene {
     this.anims.create({ key: 'op_walk', frames: gf('opossum/opossum-', 1, 6), frameRate: 8, repeat: -1 })
     this.anims.create({ key: 'l_idle', frames: [{ key: 'leo_idle' }], frameRate: 1, repeat: -1 })
     this.anims.create({ key: 'l_walk', frames: [{ key: 'leo_walk0' }, { key: 'leo_walk1' }], frameRate: 9, repeat: -1 })
+    this.anims.create({ key: 'fire_flicker', frames: [{ key: 'sf_campfire', frame: 0 }, { key: 'sf_campfire', frame: 1 }, { key: 'sf_campfire', frame: 2 }], frameRate: 8, repeat: -1 })
     this.player.play('p_idle'); this._wasAir = false
+    if (import.meta.env.DEV) window.__scene = this
     // re-compose the sprite + refresh the name/rank tags whenever the creation UI edits the character
     this._lastChar = useGame.getState().character
     this._unsub = useGame.subscribe((s) => { if (s.character !== this._lastChar) { this._lastChar = s.character; this.composeChar(); this.syncNameTag() } })
@@ -111,24 +118,35 @@ export class WorldScene extends Phaser.Scene {
 
   /* ---- interactables: house/sign/door stand-ins + glow + sparkles ---- */
   buildInteractables() {
-    const C = { shrine: { frame: 'house', sc: 1.7, glowY: -92, gs: 1.7 }, quest: { frame: 'sign', sc: 3.0, glowY: -58, gs: 1.3 }, monument: { frame: 'door', sc: 2.4, glowY: -78, gs: 1.6 } }
+    const C = {
+      journal: { src: { tex: 'sf_cave' }, sc: 2.2, glowY: -66, gs: 1.5, label: 'Journal Cave' },
+      leo: { src: { tex: 'sf_campfire', anim: 'fire_flicker' }, sc: 2.4, glowY: -40, gs: 1.0, label: 'Leo’s Campfire' },
+      todo: { src: { tex: 'sf_board' }, sc: 2.0, glowY: -62, gs: 1.0, label: 'Todo Board' },
+      shrine: { src: { atlas: 'props', frame: 'house' }, sc: 1.7, glowY: -92, gs: 1.7, label: 'Habit Shrine' },
+      monument: { src: { atlas: 'props', frame: 'door' }, sc: 2.4, glowY: -78, gs: 1.6, label: 'Monument' },
+      quest: { src: { atlas: 'props', frame: 'sign' }, sc: 3.0, glowY: -58, gs: 1.3, label: 'Quest Board' },
+      archive: { src: { tex: 'sf_archive' }, sc: 1.9, glowY: -96, gs: 1.6, label: 'Level Archive' },
+    }
     this.interactables = []
     for (const data of INTERACTABLES) {
       const meta = OBJECTS_META[data.id], cfg = C[data.id], col = Phaser.Display.Color.HexStringToColor(meta.color).color
-      const sprite = this.add.image(0, 0, 'props', cfg.frame).setOrigin(0.5, 1).setScale(cfg.sc).setTint(this.THEME.fg)
+      let sprite
+      if (cfg.src.anim) sprite = this.add.sprite(0, 0, cfg.src.tex).play(cfg.src.anim)
+      else if (cfg.src.tex) sprite = this.add.image(0, 0, cfg.src.tex)
+      else sprite = this.add.image(0, 0, cfg.src.atlas, cfg.src.frame)
+      sprite.setOrigin(0.5, 1).setScale(cfg.sc).setTint(this.THEME.fg)
       const h = sprite.displayHeight
       this.shadowAt(data.wx, data.wy + 5, h / 150, 19, 0.22)
       const cont = this.add.container(data.wx, data.wy).setDepth(20)
       const halo = this.add.image(0, cfg.glowY, 'halo').setTint(col).setScale(cfg.gs).setAlpha(.7); cont.add(halo)
       this.tweens.add({ targets: halo, scale: cfg.gs * 1.12, alpha: 1, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.inOut' })
       cont.add(sprite)
-      const label = this.add.text(0, -h - 8, this.objLabel(data.id), { fontFamily: '"Press Start 2P"', fontSize: '11px', color: '#ffffff', stroke: '#1a1230', strokeThickness: 5, align: 'center' }).setOrigin(0.5, 1); cont.add(label)
+      const label = this.add.text(0, -h - 8, cfg.label, { fontFamily: '"Press Start 2P"', fontSize: '11px', color: '#ffffff', stroke: '#1a1230', strokeThickness: 5, align: 'center' }).setOrigin(0.5, 1); cont.add(label)
       this.tweens.add({ targets: label, y: label.y - 6, duration: 1600, yoyo: true, repeat: -1, ease: 'Sine.inOut' })
       this.add.particles(data.wx, data.wy + cfg.glowY, 'star4', { x: { min: -40, max: 40 }, y: { min: -44, max: 44 }, lifespan: 1300, scale: { start: 0.8, end: 0 }, alpha: { start: 1, end: 0 }, tint: col, frequency: 240, quantity: 1, rotate: { min: 0, max: 90 } }).setDepth(21)
       data.topY = data.wy - h - 10; cont.data = { ...data, halo }; this.interactables.push(cont)
     }
   }
-  objLabel(id) { return ({ monument: 'Monument', shrine: 'Habit Shrine', quest: 'Quest Board' })[id] }
 
   /* ---- player ---- */
   buildPlayer() {
