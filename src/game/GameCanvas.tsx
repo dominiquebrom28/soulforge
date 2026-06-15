@@ -20,6 +20,7 @@ export function GameCanvas({ active }: { active: boolean }) {
       physics: { default: 'arcade', arcade: { gravity: { x: 0, y: 1600 }, debug: false } },
       scene: WorldScene,
     })
+    if (import.meta.env.DEV) (window as unknown as { __game: Phaser.Game }).__game = gameRef.current
     return () => {
       gameRef.current?.destroy(true)
       gameRef.current = null

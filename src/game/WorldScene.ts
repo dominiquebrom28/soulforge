@@ -15,16 +15,18 @@ export class WorldScene extends Phaser.Scene {
   constructor() { super('world') }
 
   preload() {
+    this.load.maxParallelDownloads = 64 // we load 40+ small files; the default cap can stall the queue
     this.load.image('sky', 'assets/sunny/env/sky.png')
     this.load.image('forest', 'assets/sunny/env/forest.png')
     this.load.image('tiles', 'assets/sunny/env/tileset.png')
     this.load.atlas('ents', 'assets/sunny/atlas/entities.png', 'assets/sunny/atlas/entities.json')
     this.load.atlas('props', 'assets/sunny/atlas/props.png', 'assets/sunny/atlas/props.json')
-    // bespoke Soulforge landmark art (cave / campfire / noticeboard / archive)
-    this.load.image('sf_cave', 'assets/sf/cave.png')
-    this.load.image('sf_board', 'assets/sf/board.png')
-    this.load.image('sf_archive', 'assets/sf/archive.png')
-    this.load.spritesheet('sf_campfire', 'assets/sf/campfire.png', { frameWidth: 34, frameHeight: 34 })
+    // GandalfHardcore landmark art (house / archive / statue / tent / animated campfire)
+    this.load.image('gh_house', 'assets/gandalf/sf/gh_house.png')
+    this.load.image('gh_archive', 'assets/gandalf/sf/gh_archive.png')
+    this.load.image('gh_statue', 'assets/gandalf/sf/gh_statue.png')
+    this.load.image('gh_tent', 'assets/gandalf/sf/gh_tent.png')
+    this.load.spritesheet('gh_campfire', 'assets/gandalf/sf/gh_campfire.png', { frameWidth: 32, frameHeight: 32 })
     // LPC modular character options (64x64 walk sheets). Art: Liberated Pixel Cup (CC-BY-SA 3.0 / GPL).
     this.load.image('o_body_male', 'assets/lpc/body/male.png'); this.load.image('o_body_female', 'assets/lpc/body/female.png')
     this.load.image('o_head_male', 'assets/lpc/head/male.png'); this.load.image('o_head_female', 'assets/lpc/head/female.png')
@@ -51,7 +53,7 @@ export class WorldScene extends Phaser.Scene {
     this.anims.create({ key: 'op_walk', frames: gf('opossum/opossum-', 1, 6), frameRate: 8, repeat: -1 })
     this.anims.create({ key: 'l_idle', frames: [{ key: 'leo_idle' }], frameRate: 1, repeat: -1 })
     this.anims.create({ key: 'l_walk', frames: [{ key: 'leo_walk0' }, { key: 'leo_walk1' }], frameRate: 9, repeat: -1 })
-    this.anims.create({ key: 'fire_flicker', frames: [{ key: 'sf_campfire', frame: 0 }, { key: 'sf_campfire', frame: 1 }, { key: 'sf_campfire', frame: 2 }], frameRate: 8, repeat: -1 })
+    this.anims.create({ key: 'fire_flicker', frames: [{ key: 'gh_campfire', frame: 0 }, { key: 'gh_campfire', frame: 1 }, { key: 'gh_campfire', frame: 2 }, { key: 'gh_campfire', frame: 3 }, { key: 'gh_campfire', frame: 4 }], frameRate: 8, repeat: -1 })
     this.player.play('p_idle'); this._wasAir = false
     if (import.meta.env.DEV) window.__scene = this
     // re-compose the sprite + refresh the name/rank tags whenever the creation UI edits the character
@@ -119,13 +121,13 @@ export class WorldScene extends Phaser.Scene {
   /* ---- interactables: house/sign/door stand-ins + glow + sparkles ---- */
   buildInteractables() {
     const C = {
-      journal: { src: { tex: 'sf_cave' }, sc: 2.2, glowY: -66, gs: 1.5, label: 'Journal Cave' },
-      leo: { src: { tex: 'sf_campfire', anim: 'fire_flicker' }, sc: 2.4, glowY: -40, gs: 1.0, label: 'Leo’s Campfire' },
-      todo: { src: { tex: 'sf_board' }, sc: 2.0, glowY: -62, gs: 1.0, label: 'Todo Board' },
-      shrine: { src: { atlas: 'props', frame: 'house' }, sc: 1.7, glowY: -92, gs: 1.7, label: 'Habit Shrine' },
-      monument: { src: { atlas: 'props', frame: 'door' }, sc: 2.4, glowY: -78, gs: 1.6, label: 'Monument' },
+      journal: { src: { tex: 'gh_tent' }, sc: 1.2, glowY: -78, gs: 1.3, label: 'Journal' },
+      leo: { src: { tex: 'gh_campfire', anim: 'fire_flicker' }, sc: 2.4, glowY: -34, gs: 1.0, label: 'Leo’s Campfire' },
+      todo: { src: { atlas: 'props', frame: 'sign' }, sc: 2.0, glowY: -58, gs: 1.0, label: 'Todo Board' },
+      shrine: { src: { tex: 'gh_house' }, sc: 1.0, glowY: -130, gs: 1.7, label: 'Habit Shrine' },
+      monument: { src: { tex: 'gh_statue' }, sc: 2.2, glowY: -90, gs: 1.5, label: 'Monument' },
       quest: { src: { atlas: 'props', frame: 'sign' }, sc: 3.0, glowY: -58, gs: 1.3, label: 'Quest Board' },
-      archive: { src: { tex: 'sf_archive' }, sc: 1.9, glowY: -96, gs: 1.6, label: 'Level Archive' },
+      archive: { src: { tex: 'gh_archive' }, sc: 1.0, glowY: -130, gs: 1.7, label: 'Level Archive' },
     }
     this.interactables = []
     for (const data of INTERACTABLES) {
