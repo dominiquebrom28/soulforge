@@ -20,9 +20,9 @@ dist-ssr
 # Claude Code local overrides
 .claude/settings.local.json
 
-# GandalfHardcore asset pack — license forbids redistribution; keep it out of the
-# (public) repo. The app references it locally; make the repo private to commit it.
-public/assets/gandalf/
+# GandalfHardcore raw pack stays local; only the prepared sprites (sf/) we use ship
+public/assets/gandalf/*
+!public/assets/gandalf/sf/
 
 # Editor directories and files
 .vscode/*

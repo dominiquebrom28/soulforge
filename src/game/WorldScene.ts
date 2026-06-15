@@ -23,7 +23,7 @@ export class WorldScene extends Phaser.Scene {
     this.load.atlas('props', 'assets/sunny/atlas/props.png', 'assets/sunny/atlas/props.json')
     // GandalfHardcore landmark art (house / archive / statue / tent / animated campfire)
     this.load.image('gh_house', 'assets/gandalf/sf/gh_house.png')
-    this.load.image('gh_bunting', 'assets/gandalf/sf/gh_bunting.png')
+    this.load.image('gh_crate', 'assets/gandalf/sf/gh_crate.png')
     this.load.image('gh_statue', 'assets/gandalf/sf/gh_statue.png')
     this.load.image('gh_tent', 'assets/gandalf/sf/gh_tent.png')
     this.load.spritesheet('gh_campfire', 'assets/gandalf/sf/gh_campfire.png', { frameWidth: 32, frameHeight: 32 })
@@ -123,7 +123,7 @@ export class WorldScene extends Phaser.Scene {
     const C = {
       journal: { src: { tex: 'gh_tent' }, sc: 1.2, glowY: -78, gs: 1.3, label: 'Journal' },
       leo: { src: { tex: 'gh_campfire', anim: 'fire_flicker' }, sc: 2.4, glowY: -34, gs: 1.0, label: 'Leo’s Campfire' },
-      todo: { src: { tex: 'gh_bunting' }, sc: 1.6, glowY: -54, gs: 1.0, label: 'Todo Board' },
+      todo: { src: { tex: 'gh_crate' }, sc: 2.0, glowY: -48, gs: 1.0, label: 'Todo Board' },
       shrine: { src: { tex: 'gh_house' }, sc: 1.0, glowY: -130, gs: 1.7, label: 'Habit Shrine' },
       monument: { src: { tex: 'gh_statue' }, sc: 2.2, glowY: -90, gs: 1.5, label: 'Monument' },
       quest: { src: { atlas: 'props', frame: 'sign' }, sc: 3.0, glowY: -58, gs: 1.3, label: 'Quest Board' },

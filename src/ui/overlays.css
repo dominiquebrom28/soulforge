@@ -73,6 +73,30 @@
   #panel.theme-monument .bubble{ --bubble-edge:#6a4ad0; background:linear-gradient(180deg, rgba(44,32,80,.94), rgba(26,18,52,.96)); color:#e6dcff; border:3px solid #6a4ad0; }
   #panel.theme-monument .bubble .soon{ background:rgba(167,139,250,.12); border-color:#7a5ad8; color:#cdbcff; }
 
+  /* default backup background so any panel stays readable even without a specific theme */
+  #panel{ background:linear-gradient(180deg,#221a38,#120c20); }
+
+  /* themes for the newer elements (journal / leo / todo / archive) */
+  #panel.theme-journal{ background:linear-gradient(180deg,#26384a,#141f2a); }
+  #panel.theme-journal .scene{ background:radial-gradient(120% 80% at 50% 20%, rgba(127,184,216,.22), transparent 60%); }
+  #panel.theme-journal .bubble{ --bubble-edge:#5d88a2; background:linear-gradient(180deg,#efe8d2,#ddd5ba); color:#3a4654; border:3px solid #5d88a2; }
+  #panel.theme-journal .bubble .soon{ background:rgba(127,184,216,.14); border-color:#5d88a2; color:#3a4654; }
+
+  #panel.theme-leo{ background:linear-gradient(180deg,#3a2418,#1d1208); }
+  #panel.theme-leo .scene{ background:radial-gradient(120% 80% at 50% 24%, rgba(246,183,60,.28), transparent 58%); }
+  #panel.theme-leo .bubble{ --bubble-edge:#b9772f; background:linear-gradient(180deg, rgba(60,40,24,.95), rgba(40,26,14,.96)); color:#f4e2c8; border:3px solid #b9772f; }
+  #panel.theme-leo .bubble .soon{ background:rgba(246,183,60,.14); border-color:#b9772f; color:#f0d3a6; }
+
+  #panel.theme-todo{ background:linear-gradient(180deg,#2c333d,#171b22); }
+  #panel.theme-todo .scene{ background:radial-gradient(120% 80% at 50% 20%, rgba(159,178,201,.2), transparent 60%); }
+  #panel.theme-todo .bubble{ --bubble-edge:#6d7d92; background:linear-gradient(180deg, rgba(48,54,64,.95), rgba(30,35,42,.96)); color:#dce3ec; border:3px solid #6d7d92; }
+  #panel.theme-todo .bubble .soon{ background:rgba(159,178,201,.14); border-color:#6d7d92; color:#bcc8d6; }
+
+  #panel.theme-archive{ background:linear-gradient(180deg,#3a2c1c,#1f1710); }
+  #panel.theme-archive .scene{ background:repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 40px), radial-gradient(120% 80% at 50% 18%, rgba(201,160,106,.22), transparent 60%); }
+  #panel.theme-archive .bubble{ --bubble-edge:#9a7038; background:linear-gradient(180deg,#eee4c8,#ded2b0); color:#4a3a22; border:3px solid #9a7038; }
+  #panel.theme-archive .bubble .soon{ background:rgba(201,160,106,.14); border-color:#9a7038; color:#6e5126; }
+
   @media (max-width:768px){
     #panel{ width:100%; height:100%; border-radius:0; border:none; }
     #panel .actors{ padding:18px 14px 4px; }

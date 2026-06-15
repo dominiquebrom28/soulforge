@@ -59,7 +59,7 @@ export const OBJECTS_META: Record<string, ObjectMeta> = {
   shrine: { icon: '🕯', color: '#23d18b', art: 'gandalf/sf/gh_house.png', title: 'THE HABIT SHRINE', desc: 'Tend your daily habits at my altar, and a light kindles for each one kept.', meta: '11 starting habits → XP into their linked stats.' },
   monument: { icon: '⬡', color: '#a78bfa', art: 'gandalf/sf/gh_statue.png', title: 'THE MONUMENT', desc: 'Look closer — this monument is <b>you</b>. Everything you become is etched into its stone.', meta: 'Two views within: the 6-stat Hexagon and the 4 Realms.' },
   quest: { icon: '📋', color: '#ffb02e', art: 'sunny/ui/sign.png', title: 'THE QUEST BOARD', desc: 'Take a quest from the board, traveller — a Daily, a Weekly, or a Monthly BOSS.', meta: 'Quest XP splits across its realm’s 2 core stats.' },
-  todo: { icon: '📝', color: '#9fb2c9', art: 'gandalf/sf/gh_bunting.png', title: 'TODAY’S TASKS', desc: 'Pin what must happen today. Cross them off as you go — no XP, just clarity.', meta: 'A freeform daily checklist; you reset it yourself.' },
+  todo: { icon: '📝', color: '#9fb2c9', art: 'gandalf/sf/gh_crate.png', title: 'TODAY’S TASKS', desc: 'Pin what must happen today. Cross them off as you go — no XP, just clarity.', meta: 'A freeform daily checklist; you reset it yourself.' },
   archive: { icon: '📚', color: '#c9a06a', art: 'sunny/ui/house.png', title: 'THE LEVEL ARCHIVE', desc: 'Enter the archive — every level, threshold, and realm mastery, catalogued.', meta: 'Full Lv 1–10 table, per-realm mastery, and Leo bond reference.', enter: true },
 }
 
