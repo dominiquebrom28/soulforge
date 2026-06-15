@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { type Character, type Theme, computeTheme } from '../game/data'
+import { loadLocalCharacter } from '../lib/profile'
 
 export type InputKey = 'left' | 'right' | 'jump' | 'interact'
 
@@ -25,10 +26,14 @@ export type GameState = {
 
 const isGuest = /[?&](guest|visitor)/i.test(location.search)
 
+const DEFAULT_CHARACTER: Character = { name: 'Soul', rank: 'Wanderer', body: 'male', hair: 'plain', haircolor: 'brown', eyes: 'brown', weapon: 'none' }
+// owners hydrate from the local cache instantly; guests always start fresh (ephemeral)
+const initialCharacter: Character = { ...DEFAULT_CHARACTER, ...(isGuest ? {} : loadLocalCharacter() || {}) }
+
 export const useGame = create<GameState>((set) => ({
   creating: true,
   mode: isGuest ? 'visitor' : 'owner',
-  character: { name: 'Soul', rank: 'Wanderer', body: 'male', hair: 'plain', haircolor: 'brown', eyes: 'brown', weapon: 'none' },
+  character: initialCharacter,
   panelId: null,
   activeObjectId: null,
   input: { left: false, right: false, jump: false, interact: false },

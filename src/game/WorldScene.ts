@@ -5,10 +5,11 @@
 import Phaser from 'phaser'
 import { useGame } from '../store/useGame'
 import {
-  CREATE, HAIR_RAMP, OBJECTS_META, rampColor, rankColor,
+  CREATE, OBJECTS_META, rankColor,
   WORLD, GROUND_TOP, SPAWN, S, PLATFORMS, INTERACTABLES, TILE,
 } from './data'
 import { leoTex, dotTex, star4Tex, haloTex, shadowTex } from './textures'
+import { composeCharacter } from './character'
 
 export class WorldScene extends Phaser.Scene {
   constructor() { super('world') }
@@ -60,36 +61,7 @@ export class WorldScene extends Phaser.Scene {
 
   /* ---- composite the selected LPC layers into one walk sheet (live, re-runnable) ---- */
   composeChar() {
-    const C = useGame.getState().character, b = C.body
-    const exists = this.textures.exists('char_walk')
-    const tex = exists ? this.textures.get('char_walk') : this.textures.createCanvas('char_walk', 576, 256)
-    const ctx = tex.getContext(); ctx.imageSmoothingEnabled = false; ctx.clearRect(0, 0, 576, 256)
-    const drawKey = k => { if (this.textures.exists(k)) ctx.drawImage(this.textures.get(k).getSourceImage(), 0, 0) }
-    drawKey('o_body_' + b); drawKey('o_head_' + b); drawKey('o_eyes_' + C.eyes)
-    drawKey('o_fit_' + b + '_bottom'); drawKey('o_fit_' + b + '_feet'); drawKey('o_fit_' + b + '_top')
-    ctx.drawImage(this.recolorHair(C.hair, C.haircolor || 'brown'), 0, 0)
-    if (C.weapon && C.weapon !== 'none') drawKey('o_weapon_' + C.weapon)
-    tex.refresh()
-    if (!exists) { let i = 0; for (let r = 0; r < 4; r++) for (let c = 0; c < 9; c++) { tex.add(i, 0, c * 64, r * 64, 64, 64); i++ } }
-    // SOUTH-row (front-facing) frames for the DOM preview + portrait — every weapon reads clearly front-on.
-    const src = tex.getSourceImage(); const frames = []
-    for (let c = 0; c < 9; c++) {
-      const fc = document.createElement('canvas'); fc.width = 64; fc.height = 64; const fx = fc.getContext('2d')
-      fx.imageSmoothingEnabled = false; fx.drawImage(src, c * 64, 2 * 64, 64, 64, 0, 0, 64, 64); frames.push(fc.toDataURL())
-    }
-    useGame.getState().setCharFrames(frames)
-  }
-
-  /* LPC ships hair in one colour; recolour by luminance gradient-map so any colour works (cached) */
-  recolorHair(style, colour) {
-    if (!this._hairCache) this._hairCache = {}
-    const key = style + '_' + colour; if (this._hairCache[key]) return this._hairCache[key]
-    const img = this.textures.get('o_hair_' + style).getSourceImage()
-    const cv = document.createElement('canvas'); cv.width = 576; cv.height = 256; const cx = cv.getContext('2d')
-    cx.imageSmoothingEnabled = false; cx.drawImage(img, 0, 0)
-    const ramp = HAIR_RAMP[colour] || HAIR_RAMP.brown, id = cx.getImageData(0, 0, 576, 256), d = id.data
-    for (let i = 0; i < d.length; i += 4) { if (d[i + 3] > 10) { const L = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2], c = rampColor(L, ramp); d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2] } }
-    cx.putImageData(id, 0, 0); this._hairCache[key] = cv; return cv
+    useGame.getState().setCharFrames(composeCharacter(this, useGame.getState().character))
   }
 
   /* ---- parallax sky + forest (Sunny Land) ---- */

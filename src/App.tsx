@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { GameCanvas } from './game/GameCanvas'
 import { useGame } from './store/useGame'
+import { loadProfile, saveProfile } from './lib/profile'
 import { Hud } from './ui/Hud'
 import { CreationScreen } from './ui/CreationScreen'
 import { ConversationPanel } from './ui/ConversationPanel'
@@ -23,6 +24,17 @@ export default function App() {
     fonts.finally(go)
     const t = setTimeout(go, 1800)
     return () => clearTimeout(t)
+  }, [])
+
+  // persistence (owner only): reconcile with Supabase on boot, then save edits (debounced)
+  useEffect(() => {
+    if (useGame.getState().mode !== 'owner') return
+    loadProfile().then((remote) => { if (remote) useGame.getState().setCharacter(remote) })
+    let t: ReturnType<typeof setTimeout>
+    const unsub = useGame.subscribe((s, prev) => {
+      if (s.character !== prev.character) { clearTimeout(t); t = setTimeout(() => saveProfile(s.character), 400) }
+    })
+    return () => { clearTimeout(t); unsub() }
   }, [])
 
   return (
