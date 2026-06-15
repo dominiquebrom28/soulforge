@@ -1,0 +1,123 @@
+/* Slice-1 overlay + world styles — lifted verbatim from the prototype's <style> block.
+   React renders the same ids/classes, so these selectors keep working unchanged. */
+  :root{ --gold:#f59e0b; --purple:#a78bfa; --panel-edge:#3a2d5e; --ink:#e9e2ff; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#74d3ec;
+    font-family:"VT323", monospace; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; }
+  #game{ position:absolute; inset:0; background:#74d3ec; }
+  canvas{ display:block; image-rendering:pixelated; }
+  #grade{ position:absolute; inset:0; z-index:12; pointer-events:none; }
+
+  #hud{ position:absolute; inset:0; pointer-events:none; z-index:20; color:#fff; font-family:"Press Start 2P", monospace; }
+  #clock{ position:absolute; top:12px; right:12px; background:rgba(18,14,34,.72); border:2px solid rgba(167,139,250,.6); border-radius:10px; padding:8px 11px 7px; box-shadow:0 4px 0 rgba(0,0,0,.35), inset 0 0 12px rgba(167,139,250,.18); min-width:118px; }
+  #clock .t{ font-size:16px; letter-spacing:1px; color:#fff; }
+  #clock .sub{ font-family:"VT323",monospace; font-size:15px; margin-top:5px; color:#cdbcff; line-height:1.15; }
+  #clock .lab{ font-family:"VT323",monospace; font-size:13px; color:#8f7fc4; margin-top:4px; }
+  #hint{ position:absolute; left:12px; bottom:12px; background:rgba(18,14,34,.6); border:2px solid rgba(255,255,255,.18); border-radius:8px; padding:7px 10px; font-family:"VT323",monospace; font-size:17px; color:#dfe7ff; line-height:1.25; max-width:60vw; }
+  #hint b{ color:var(--gold); }
+  #title-toast{ position:absolute; top:14px; left:50%; transform:translateX(-50%); text-align:center; transition:opacity 1s ease 2.4s; opacity:1; }
+  #title-toast .a{ font-size:20px; color:#fff; text-shadow:0 2px 0 #5b3fa6,0 0 14px #a78bfa; }
+  #title-toast .b{ font-family:"VT323",monospace; font-size:16px; color:#fff; margin-top:6px; text-shadow:0 1px 3px rgba(0,0,0,.6); }
+
+  /* dim: keep the world VISIBLE & lit behind (faint), not a black-out */
+  #dim{ position:absolute; inset:0; z-index:30; opacity:0; pointer-events:none; transition:opacity .25s ease;
+    background:rgba(8,10,20,.5); backdrop-filter:blur(2px) saturate(.9); }
+  #dim.show{ opacity:1; pointer-events:auto; }
+  /* CONVERSATION drawer: you (left) meet the element (right), each element themed.
+     Rises large from the bottom; world stays dimly visible above. */
+  #panel{ position:absolute; z-index:40; left:50%; bottom:0; transform:translate(-50%,114%);
+    width:min(1000px,97vw); height:min(600px,82vh); pointer-events:none; overflow:hidden;
+    border:5px solid #20140a; border-bottom:none; border-radius:18px 18px 0 0;
+    box-shadow:0 0 0 4px rgba(0,0,0,.45), 0 -10px 44px rgba(0,0,0,.4);
+    transition:transform .4s cubic-bezier(.22,1.35,.5,1); }
+  #panel.show{ transform:translate(-50%,0); pointer-events:auto; }
+  #panel .x{ position:absolute; top:12px; right:12px; z-index:6; pointer-events:auto; cursor:pointer; width:34px; height:34px;
+    display:grid; place-items:center; border-radius:8px; background:rgba(18,12,28,.6); border:2px solid rgba(255,255,255,.25);
+    font-family:"Press Start 2P",monospace; font-size:13px; color:#fff; }
+  #panel .x:hover{ background:rgba(239,68,68,.55); }
+  #panel .scene{ position:absolute; inset:0; display:flex; flex-direction:column; }
+  #panel .actors{ flex:1; display:flex; justify-content:space-around; align-items:flex-end; padding:24px 26px 8px; min-height:0; gap:14px; }
+  #panel .actor{ display:flex; flex-direction:column; align-items:center; gap:12px; min-width:0; }
+  #panel .actor .stand{ position:relative; display:flex; align-items:flex-end; justify-content:center; }
+  #panel .actor .stand::after{ content:""; position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); width:66%; height:16px; border-radius:50%; background:rgba(0,0,0,.32); }
+  #panel .actor img{ image-rendering:pixelated; position:relative; }
+  #panel .actor.player img{ height:min(210px,34vh); }
+  #panel .actor.element img{ height:min(232px,36vh); }
+  #panel .actor .nm{ font-family:"Press Start 2P",monospace; font-size:11px; padding:7px 12px; border-radius:9px;
+    background:rgba(14,10,22,.68); color:#fff; border:2px solid rgba(255,255,255,.2); white-space:nowrap;
+    display:flex; align-items:center; gap:7px; box-shadow:0 3px 0 rgba(0,0,0,.3); }
+  #panel .actor.element .nm{ border-color:var(--accent,#fff); text-shadow:0 0 8px var(--accent); }
+  #panel .actor .nm .ic{ filter:drop-shadow(0 0 5px currentColor); color:var(--accent); }
+  #panel .actor .nm.pn{ flex-direction:column; align-items:center; gap:3px; line-height:1.25; }
+  #panel .actor .nm.pn .rk{ font-size:7px; letter-spacing:1.5px; color:#9fb2c9; text-shadow:0 0 6px rgba(159,178,201,.55); }
+  /* dialogue bubble (the element 'speaks'); tail points toward the element on the right */
+  #panel .bubble{ position:relative; margin:0 22px 20px; padding:15px 18px 16px; border-radius:14px; font-size:20px; line-height:1.4; }
+  #panel .bubble::before{ content:""; position:absolute; top:-13px; right:66px; border:7px solid transparent; border-bottom-color:var(--bubble-edge,#8a6a36); }
+  #panel .bubble .tag{ display:inline-block; font-family:"Press Start 2P",monospace; font-size:9px; color:#fff; background:var(--accent,#a9783e); border:2px solid rgba(0,0,0,.25); border-radius:6px; padding:5px 7px; margin-bottom:10px; letter-spacing:.5px; }
+  #panel .bubble p{ margin:0 0 8px; } #panel .bubble p b{ color:var(--accent); font-weight:normal; }
+  #panel .bubble .meta{ font-size:16px; opacity:.82; }
+  #panel .bubble .soon{ margin-top:10px; padding:9px 11px; border-radius:8px; font-size:16px; border:2px dashed; }
+
+  #panel.theme-quest{ background:linear-gradient(180deg,#7a532e,#43301c); }
+  #panel.theme-quest .scene{ background:repeating-linear-gradient(90deg, rgba(0,0,0,.10) 0 2px, transparent 2px 46px), radial-gradient(120% 80% at 50% 16%, rgba(255,210,120,.18), transparent 60%); }
+  #panel.theme-quest .bubble{ --bubble-edge:#8a6a36; background:linear-gradient(180deg,#f6e8c6,#eddaa8); color:#4a3420; border:3px solid #8a6a36; }
+  #panel.theme-quest .bubble .soon{ background:rgba(110,69,36,.12); border-color:#b07f3e; color:#6e4f2a; }
+
+  #panel.theme-shrine{ background:linear-gradient(180deg,#2c4a40,#162421); }
+  #panel.theme-shrine .scene{ background:radial-gradient(120% 80% at 72% 22%, rgba(35,209,139,.28), transparent 58%), radial-gradient(80% 60% at 26% 82%, rgba(35,209,139,.10), transparent 60%); }
+  #panel.theme-shrine .bubble{ --bubble-edge:#2f8f68; background:linear-gradient(180deg, rgba(40,64,56,.94), rgba(24,40,34,.96)); color:#d7f3e6; border:3px solid #2f8f68; }
+  #panel.theme-shrine .bubble .soon{ background:rgba(35,209,139,.10); border-color:#2f8f68; color:#a9e8cf; }
+
+  #panel.theme-monument{ background:linear-gradient(180deg,#2a2050,#100a22); }
+  #panel.theme-monument .scene{ background:radial-gradient(120% 80% at 60% 22%, rgba(167,139,250,.34), transparent 58%), radial-gradient(2px 2px at 20% 30%, #fff, transparent), radial-gradient(2px 2px at 75% 18%, #cdbcff, transparent), radial-gradient(1.5px 1.5px at 45% 12%, #fff, transparent), radial-gradient(2px 2px at 88% 42%, #fff, transparent), radial-gradient(1.5px 1.5px at 33% 22%, #fff, transparent); }
+  #panel.theme-monument .bubble{ --bubble-edge:#6a4ad0; background:linear-gradient(180deg, rgba(44,32,80,.94), rgba(26,18,52,.96)); color:#e6dcff; border:3px solid #6a4ad0; }
+  #panel.theme-monument .bubble .soon{ background:rgba(167,139,250,.12); border-color:#7a5ad8; color:#cdbcff; }
+
+  @media (max-width:768px){
+    #panel{ width:100%; height:100%; border-radius:0; border:none; }
+    #panel .actors{ padding:18px 14px 4px; }
+    #panel .actor.player img{ height:20vh; } #panel .actor.element img{ height:22vh; }
+    #panel .actor .nm{ font-size:10px; } #panel .bubble{ font-size:19px; margin:0 14px 16px; }
+  }
+
+  #touch{ position:absolute; left:0; right:0; bottom:0; z-index:25; display:none; justify-content:space-between; align-items:flex-end; padding:14px 16px calc(14px + env(safe-area-inset-bottom)); pointer-events:none; }
+  #touch.show{ display:flex; }
+  .pad{ display:flex; gap:12px; pointer-events:auto; }
+  .btn{ width:64px; height:64px; border-radius:16px; display:grid; place-items:center; background:rgba(24,18,42,.55); border:2px solid rgba(255,255,255,.22); color:#fff; font-size:28px; font-family:"Press Start 2P",monospace; box-shadow:0 4px 0 rgba(0,0,0,.35); touch-action:none; transition:transform .05s, background .1s; }
+  .btn:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.35); background:rgba(60,46,104,.7); }
+  .btn.jump{ background:rgba(40,30,72,.6); }
+  .btn.interact{ width:74px; height:74px; font-size:22px; background:rgba(60,46,104,.4); border-color:rgba(167,139,250,.3); color:#8f7fc4; }
+  .btn.interact.live{ background:rgba(245,158,11,.85); border-color:#ffd479; color:#1b1305; box-shadow:0 4px 0 rgba(120,70,0,.5), 0 0 22px rgba(245,158,11,.7); animation:pulse 1.1s ease-in-out infinite; }
+  @keyframes pulse{ 50%{ transform:scale(1.06); } }
+  #loading{ position:absolute; inset:0; z-index:60; display:grid; place-items:center; background:#0b0a14; color:#a78bfa; font-family:"Press Start 2P",monospace; font-size:13px; text-align:center; line-height:2; }
+
+  /* ---- character creation (owner & guest use the same flow) ---- */
+  #create{ position:absolute; inset:0; z-index:50; display:none; align-items:center; justify-content:center; padding:18px;
+    background:radial-gradient(ellipse at 50% 30%, rgba(30,24,56,.72), rgba(8,8,20,.88)); backdrop-filter:blur(2px); }
+  #create.show{ display:flex; }
+  .cr-panel{ display:flex; width:min(940px,96vw); max-height:94vh; overflow:hidden; background:linear-gradient(180deg,#241a3f,#171026);
+    border:3px solid #4b3a78; border-radius:18px; box-shadow:0 24px 70px rgba(0,0,0,.6), inset 0 0 30px rgba(167,139,250,.1); color:#e9e2ff; font-family:"VT323",monospace; }
+  .cr-stage{ width:42%; padding:28px 22px; display:flex; flex-direction:column; align-items:center; text-align:center;
+    background:radial-gradient(ellipse at 50% 36%, rgba(167,139,250,.22), transparent 62%), linear-gradient(180deg,#2a2150,#1a1230); border-right:3px solid #3a2d5e; }
+  .cr-title{ font-family:"Press Start 2P",monospace; font-size:13px; color:#fff; text-shadow:0 0 12px rgba(167,139,250,.7); line-height:1.6; }
+  .cr-sub{ font-size:16px; color:#bcaef0; margin-top:8px; line-height:1.2; }
+  .cr-rank{ font-family:"Press Start 2P",monospace; font-size:8px; letter-spacing:1.5px; color:#9fb2c9; margin-top:10px; text-shadow:0 0 8px rgba(159,178,201,.5); }
+  .cr-pedestal{ flex:1; display:flex; align-items:flex-end; justify-content:center; width:100%; position:relative; margin-top:10px; }
+  .cr-pedestal::after{ content:""; position:absolute; bottom:14px; left:50%; transform:translateX(-50%); width:140px; height:26px; border-radius:50%; background:radial-gradient(ellipse, rgba(167,139,250,.5), transparent 70%); }
+  #cr-preview{ image-rendering:pixelated; height:min(300px,46vh); position:relative; filter:drop-shadow(0 6px 8px rgba(0,0,0,.5)); animation:crbob 2.4s ease-in-out infinite; }
+  @keyframes crbob{ 50%{ transform:translateY(-5px); } }
+  .cr-form{ flex:1; min-width:0; padding:28px 32px; overflow:auto; display:flex; flex-direction:column; }
+  .cr-l{ font-family:"Press Start 2P",monospace; font-size:9px; color:#9d8fd0; margin:20px 0 10px; letter-spacing:.5px; }
+  .cr-l:first-child{ margin-top:0; } .cr-hint{ color:#6f64a0; }
+  .cr-name{ font-family:"VT323",monospace; font-size:22px; background:#120c22; border:2px solid #4b3a78; border-radius:9px; color:#fff; padding:9px 14px; outline:none; }
+  .cr-name:focus{ border-color:#a78bfa; }
+  .cr-row{ display:flex; flex-wrap:wrap; gap:11px; }
+  .cr-chip{ font-family:"VT323",monospace; font-size:18px; cursor:pointer; padding:8px 16px; border-radius:9px; background:#1c1430; border:2px solid #3a2d5e; color:#cdbcff; }
+  .cr-chip:hover{ border-color:#6f5aa8; }
+  .cr-chip.on{ background:#3a2d5e; border-color:#a78bfa; color:#fff; box-shadow:0 0 12px rgba(167,139,250,.4); }
+  .cr-chip.sw{ width:34px; height:34px; padding:0; background:var(--sw); border:2px solid #3a2d5e; }
+  .cr-chip.sw.on{ border-color:#fff; box-shadow:0 0 0 2px #a78bfa, 0 0 12px rgba(167,139,250,.5); }
+  .cr-begin{ margin-top:auto; font-family:"Press Start 2P",monospace; font-size:12px; cursor:pointer; padding:14px; border-radius:12px;
+    background:linear-gradient(180deg,#f6b53a,#e08a1e); border:3px solid #9a5a12; color:#3a2208; box-shadow:0 5px 0 #8a4e10; }
+  .cr-begin:hover{ filter:brightness(1.06); } .cr-begin:active{ transform:translateY(3px); box-shadow:0 2px 0 #8a4e10; }
+  @media (max-width:768px){ .cr-panel{ flex-direction:column; max-height:96vh; overflow:auto; } .cr-stage{ width:100%; border-right:none; border-bottom:3px solid #3a2d5e; } #cr-preview{ height:30vh; } }
