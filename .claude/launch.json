@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "soulforge-static",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-I",
+        "-c",
+        "import os; os.chdir('/Users/doom/Documents/VibeCodeProjects/SoulForce-V2'); from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer; H=type('H',(SimpleHTTPRequestHandler,),{'address_string':lambda s:'-','log_message':lambda *a:None}); ThreadingHTTPServer(('127.0.0.1',8141),H).serve_forever()"
+      ],
+      "port": 8141
+    }
+  ]
+}
